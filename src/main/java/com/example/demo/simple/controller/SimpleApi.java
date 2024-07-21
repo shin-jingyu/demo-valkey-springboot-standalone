@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("simple")
@@ -22,8 +23,7 @@ public class SimpleApi {
     @GetMapping("/{key}")
     public Simple get(@PathVariable String key) {
         return simpleRepository.findById(key)
-                 .orElse(null);
-        // suggested: .orElseThrow( ... );
+                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
