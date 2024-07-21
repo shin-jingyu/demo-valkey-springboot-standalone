@@ -11,34 +11,13 @@ public final class MobileOtpDto {
     @Builder
     public record OptSaveRequest(
             @NotBlank
-            @Pattern(regexp ="/^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/")
+            @Pattern(regexp = "^01(0|1|[6-9])-?\\d{3,4}-?\\d{4}$")
             String tel,
             @NotBlank
             String otp,
             @NotBlank
             Integer ttl
     ){
-
-    }
-
-    @Builder
-    public record OptSelectRequst(
-            @NotBlank
-            @Pattern(regexp ="/^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/")
-            String tel,
-            String otp
-    ){
-
-    }
-
-    @Builder
-    public record OptDeleteRequst(
-            @NotBlank
-            @Pattern(regexp ="/^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/")
-            String tel,
-            String otp
-    ){
-
     }
 
     @Builder
@@ -47,21 +26,13 @@ public final class MobileOtpDto {
             String otp,
             Integer ttl
     ){
-
     }
 
     @Builder
     public record OptSelectResponse(
-            @NotBlank
             String tel,
             String otp,
             Integer ttl
     ){
     }
-
-    @Builder
-    public record OptDeleteResponse(
-            String tel
-    ){}
-
 }

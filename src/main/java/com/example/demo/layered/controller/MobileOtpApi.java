@@ -8,6 +8,7 @@ import com.example.demo.layered.mapper.MobileOtpDtoMapper;
 import com.example.demo.layered.usecase.MobileOptDeleteUseCase;
 import com.example.demo.layered.usecase.MobileOptSelectUseCase;
 import com.example.demo.layered.usecase.MobileOtpCreateUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +33,7 @@ public class MobileOtpApi {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OptSaveResponse createMobileOtp(@RequestBody OptSaveRequest mobileOtp) {
+    public OptSaveResponse createMobileOtp(@RequestBody @Valid OptSaveRequest mobileOtp) {
         MobileOtp otp = createUseCase.mobileOtpCreate(mobileOtp);
         return mapper.toSaveResponse(otp);
     }
