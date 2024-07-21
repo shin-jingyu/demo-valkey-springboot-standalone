@@ -1,5 +1,6 @@
 package com.example.demo.layered.service;
 
+import com.example.demo.common.util.random.DecimalSecuredRandom;
 import com.example.demo.layered.controller.dto.MobileOtpDto.OptSaveRequest;
 import com.example.demo.layered.controller.dto.MobileOtpDto.OptSelectResponse;
 import com.example.demo.layered.entity.MobileOtp;
@@ -21,12 +22,17 @@ public class MobileOptService implements MobileOtpCreateUseCase, MobileOptSelect
     private final MobileOptRepository mobileOptRepository;
     private final MobileOtpDtoMapper mobileOtpDtoMapper;
 
-
     @Override
     public MobileOtp mobileOtpCreate(MobileOtp mobileOtp) {
         Optional<MobileOtp> otp = mobileOptRepository.findByTel(mobileOtp.tel);
         // tel이 존재하면 삭제하고 새로 등록한다. (ifPresent = if + isPresent)
         otp.ifPresent(mobileOptRepository::delete);
+        if (mobileOtp.otp == null || mobileOtp.otp.isBlank()) {
+            mobileOtp.otp = DecimalSecuredRandom.nextStrong(6);
+        }
+        if (mobileOtp.ttl == null) {
+            mobileOtp.ttl = 180;
+        }
         return mobileOptRepository.save(mobileOtp);
     }
 

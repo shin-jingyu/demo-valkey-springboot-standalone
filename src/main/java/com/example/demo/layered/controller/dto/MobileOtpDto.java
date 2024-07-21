@@ -14,9 +14,7 @@ public final class MobileOtpDto {
             @Pattern(regexp = "^01(0|1|[6-9])-?\\d{3,4}-?\\d{4}$")
             String tel,
             @NotBlank
-            String otp,
-            @NotBlank
-            Integer ttl
+            String otp
     ){
     }
 
