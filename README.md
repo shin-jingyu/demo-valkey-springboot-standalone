@@ -59,114 +59,106 @@ spring boot에서도 redis를 다루기 위한 주요 라이브러리를 valkey�
 
 ---
 
-# 개요
-이 프로젝트에서는 **Spring Boot**와 **Redis**를 활용한 **OTP(One-Time Password)** 시스템을 구현했습니다.
-Redis의 다양한 기능을 활용하여 빠르고 효율적인 데이터 관리 시스템을 구현하는 방법을 학습할 수 있습니다. 특히, **DTO 패턴**, **UseCase 인터페이스**, **@Indexed** 사용 등 실무에서 유용한 기술들을 적극 도입하였습니다.
+# Demo Valkey Spring Boot Standalone
 
-# 학습 목표
-* **Spring Boot**와 **Redis**를 기반으로 한 애플리케이션 개발 경험
-* **OTP** 시스템의 기본 구조와 구현 방식 습득
-* **DTO** 패턴을 통한 데이터 전송 최적화 및 엔티티 노출 방지
-* **UseCase** 인터페이스를 도입하여 비즈니스 로직의 가독성과 유지보수성 향상
-* **@Indexed**를 통해 Redis 데이터의 효율적인 조회 구현
----
+이 프로젝트는 Spring Boot와 Redis를 사용하여 구현된 독립 실행형 OTP 관리 애플리케이션입니다. 효율적이고 확장 가능한 아키텍처를 통해 OTP 생성, 조회, 삭제 기능을 제공합니다.
 
-## 1. 프로젝트 구조
-* **계층형 아키텍처**: Controller, Service, Repository, Entity로 구성
-* 각 계층 간의 역할 분리 및 유연한 데이터 처리 지원
-* **DTO(Data Transfer Object)** 패턴을 도입하여 계층 간 데이터 전송을 개선
-* **UseCase 인터페이스**를 사용하여 비즈니스 로직을 모듈화하고 가독성을 높임
-<br><br>
-## 2. 주요 컴포넌트와 코드
-* **EmailOtp 엔티티**: Redis에 OTP 데이터를 저장하며, @Indexed를 통해 이메일 필드에 대한 효율적인 조회를 지원
+## 📌 프로젝트 개요
+- **기술 스택**: Java, Spring Boot, Redis, Docker, Lombok
+- **주요 기능**: OTP 생성, 조회, 삭제
+- **구조**: 계층형 아키텍처로 구성 (Controller, Service, Repository, Entity)
 
-```java
+## 🚀 프로젝트 특징
+- **커스텀 에러 코드 인터페이스**: `ErrorCode` 인터페이스를 통해 다양한 예외 상황에 대해 일관성 있는 에러 코드를 정의하고 확장성 있는 예외 처리를 구현했습니다.
+- **RESTful API 구현**: OTP 생성, 조회, 삭제 기능을 제공하는 RESTful API 엔드포인트 구현.
+- **Redis 활용**: OTP 데이터를 Redis에 저장하여 높은 처리 속도와 확장성을 보장.
+- **계층형 아키텍처**: 역할별 코드 분리로 유지보수성 및 확장성 향상.
+- **보안성 강화**: OTP 생성에 `SecureRandom`을 사용하여 안전한 난수 생성.
+- **Docker 기반 배포**: Redis와 애플리케이션을 컨테이너화하여 손쉬운 배포와 환경 설정 가능.
 
-@RedisHash("otp")
-public class EmailOtp {
-    @Id
-    private String id;
-    
-    @Indexed
-    public String email;
-    
-    private String otp;
-    private String refreshToken;
-    
-    @TimeToLive
-    private Integer ttl;
-}
-```
+## 🌟 주요 기능
+- **OTP 생성**: 전화번호를 입력받아 OTP를 생성하고 Redis에 저장합니다.
+- **OTP 조회**: 전화번호를 통해 저장된 OTP를 조회합니다.
+- **OTP 삭제**: 특정 전화번호와 관련된 OTP를 삭제합니다.
 
-<br>
+## 📋 사용된 기술
+- **Spring Boot**: 빠른 개발과 프로덕션 수준의 애플리케이션 제공.
+- **Redis**: 데이터 저장 및 조회를 빠르게 처리하기 위한 인메모리 데이터베이스.
+- **Docker**: 컨테이너화를 통한 일관된 환경 제공.
+- **Lombok**: 반복 코드를 줄여주는 편리한 애노테이션 사용.
+- **MapStruct**: DTO와 엔티티 간의 매핑을 자동화하여 코드의 가독성과 유지보수성 향상.
+- **Spring Boot**: 빠른 개발과 프로덕션 수준의 애플리케이션 제공.
+- **Redis**: 데이터 저장 및 조회를 빠르게 처리하기 위한 인메모리 데이터베이스.
+- **Docker**: 컨테이너화를 통한 일관된 환경 제공.
+- **Lombok**: 반복 코드를 줄여주는 편리한 애노테이션 사용.
 
-* @Indexed는 email 필드에 대한 인덱스를 생성하여 Redis에서 빠른 조회를 가능하게 함.
+## 🛠️ 설치 및 실행 방법
+1. **환경 구성**: Redis 설정을 아래와 같이 `application.yml` 파일에 추가합니다.
+   ```yaml
+   spring.data.redis:
+     host: ${REDIS_MASTER_HOST:localhost}
+     port: ${REDIS_MASTER_PORT:6378}
+     password: ${REDIS_MASTER_PASSWORD:root}
+   ```
+2. **Docker Compose**를 사용하여 Redis 마스터-슬레이브 환경을 설정합니다. 아래는 `docker-compose.yml` 파일의 내용입니다.
+   ```yaml
+   version: "3"
 
-<br>
+   services:
+     demo-valkey-primary:
+       image: docker.io/bitnami/valkey:7.2
+       ports:
+         - '6378:6379'
+       environment:
+         - VALKEY_REPLICATION_MODE=master
+         - VALKEY_PASSWORD=root
+         - VALKEY_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+       volumes:
+         - 'sticky_volume_demo-valkey-primary:/bitnami/valkey/data'
 
-* EmailOtpRepository: Redis와의 CRUD 연산을 담당하며, findByRefreshToken 메서드를 통해 리프레시 토큰 기반 조회 기능 제공
+     demo-valkey-secondary:
+       image: docker.io/bitnami/valkey:7.2
+       ports:
+         - '6379:6379'
+       depends_on:
+         - demo-valkey-primary
+       environment:
+         - VALKEY_REPLICATION_MODE=slave
+         - VALKEY_MASTER_HOST=demo-valkey-primary
+         - VALKEY_MASTER_PORT_NUMBER=6379
+         - VALKEY_MASTER_PASSWORD=root
+         - VALKEY_PASSWORD=root
+         - VALKEY_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
 
-```java
-public interface EmailOtpRepository extends CrudRepository<EmailOtp, String> {
-    EmailOtp findByRefreshToken(String refreshToken);
-}
-```
+   volumes:
+     sticky_volume_demo-valkey-primary:
+       driver: local
+   ```
+3. **애플리케이션 빌드 및 실행**:
+   ```sh
+   ./gradlew build
+   docker-compose up
+   ```
 
-<br>
+## 📂 프로젝트 구조
+- **common.exception**: 공통 예외 처리 및 오류 응답 정의.
+- **controller**: API 엔드포인트 정의 및 요청 처리.
+- **service**: 비즈니스 로직 구현.
+- **repository**: Redis 데이터 접근 계층.
+- **entity**: 데이터 모델 정의.
+- **mapper**: DTO와 엔티티 간의 변환.
 
-* **DTO의 공개 필드**: 이 프로젝트에서는 **DTO(Data Transfer Object)**를 public 필드로 설정하여 유연하고 간결한 데이터 전송을 구현
+## 💡 학습 포인트
+- **커스텀 에러 코드 인터페이스 사용**: `ErrorCode` 인터페이스를 사용하여 커스텀 에러 코드를 정의하고 일관된 예외 처리를 구현하는 방법을 학습했습니다.
+- **OTP 보안**: `SecureRandom`을 사용하여 보안성이 높은 OTP를 생성하는 방법을 학습했습니다.
+- **Redis와 Spring 통합**: Redis를 사용하여 빠르고 효율적인 OTP 저장소를 구성하는 방법을 배웠습니다.
+- **Docker Compose**: Redis 마스터-슬레이브 구조를 손쉽게 설정하고 관리하는 방법을 습득했습니다.
+- **MapStruct 사용**: DTO와 엔티티 간의 변환을 자동화하여 코드의 유지보수성을 높이는 방법을 배웠습니다.
+- **OTP 보안**: `SecureRandom`을 사용하여 보안성이 높은 OTP를 생성하는 방법을 학습했습니다.
+- **Redis와 Spring 통합**: Redis를 사용하여 빠르고 효율적인 OTP 저장소를 구성하는 방법을 배웠습니다.
+- **Docker Compose**: Redis 마스터-슬레이브 구조를 손쉽게 설정하고 관리하는 방법을 습득했습니다.
 
-```java
-@Builder
-public record EmailOtpDto(String email, String otp, Integer ttl, String refreshToken) {}
-```
 
-<br>
 
-* public DTO 필드를 통해 코드의 간결함을 유지하고, 불필요한 getter/setter 생성을 줄임.
-
-<br>
-
-* EmailOtpService: OTP 생성, 조회, 삭제, 리프레시 토큰 갱신 기능을 담당하며, UseCase 인터페이스를 통해 모듈화된 비즈니스 로직을 구현
-
-```java
-public class EmailOtpService implements EmailOtpCreateUseCase, EmailOtpReadUseCase, EmailOtpDeleteUseCase {
-    // Service logic
-}
-```
-
-<br>
-
-* UseCase 인터페이스 도입을 통해 기능별로 책임을 분리하고, 코드의 유지보수성을 높임
-
-<br>
-
-## 3. Redis 활용
-* "@RedisHash", "@TimeToLive"를 사용하여 Redis에 OTP 데이터를 저장하고 만료 시간을 설정
-* 인메모리 캐시를 통해 빠르고 효율적인 OTP 관리
-* @Indexed를 통해 Redis에서 특정 필드의 빠른 조회 가능
- 
-  <br>
-  
-## 4. RESTful API 설계
-* POST /otp: OTP 생성
-* GET /otp/{id}: OTP 조회
-* DELETE /otp/{id}: OTP 삭제
-* OST /otp/refresh: 리프레시 토큰으로 새 OTP 발급
-
-   <br>
-
-## 5. 보안 고려사항
-* SecureRandom을 사용하여 안전한 랜덤 토큰 생성
-* 리프레시 토큰을 사용한 OTP 갱신 메커니즘 구현
-
-   <br>
-
-## 6. 사용된 Spring Boot 기능
-*  의존성 주입 (DI)
-* Spring Data Redis
-* RESTful API 구현
-* 어노테이션 기반 설정
-* DTO와 UseCase 인터페이스 도입
 
 
